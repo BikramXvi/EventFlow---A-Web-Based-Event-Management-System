@@ -8,13 +8,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import java.sql.ResultSet;
+import java.util.Map;
 
-/**
- * Handles user login.
- * GET  -> shows login page
- * POST -> processes login form
- */
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 
@@ -29,7 +24,7 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String email = request.getParameter("email").trim();
+        String email    = request.getParameter("email").trim();
         String password = request.getParameter("password").trim();
 
         if (email.isEmpty() || password.isEmpty()) {
@@ -40,40 +35,67 @@ public class LoginServlet extends HttpServlet {
         }
 
         UserModel userModel = new UserModel();
-        ResultSet user = userModel.loginUser(email, password);
+
+        if (userModel.isLockedByAttempts(email)) {
+            request.setAttribute("errorMessage", "Too many failed attempts. Try again in 15 minutes.");
+            request.getRequestDispatcher("/WEB-INF/pages/shared/login.jsp")
+                   .forward(request, response);
+            return;
+        }
+
+        Map<String, Object> user = userModel.getUserByEmail(email);
 
         if (user != null) {
-            try {
+            String storedHash = (String) user.get("password");
+            boolean passwordMatch = org.mindrot.jbcrypt.BCrypt.checkpw(password, storedHash);
+
+            if (passwordMatch) {
+                if ((int) user.get("is_locked") == 1) {
+                    request.setAttribute("errorMessage", "Your account has been locked. Contact support.");
+                    request.getRequestDispatcher("/WEB-INF/pages/shared/login.jsp")
+                           .forward(request, response);
+                    return;
+                }
+
+                if ((int) user.get("is_active") == 0) {
+                    request.setAttribute("errorMessage", "Your account is inactive. Contact support.");
+                    request.getRequestDispatcher("/WEB-INF/pages/shared/login.jsp")
+                           .forward(request, response);
+                    return;
+                }
+
                 userModel.recordLoginAttempt(email, true);
 
                 HttpSession session = request.getSession();
-                session.setAttribute("userId", user.getInt("id"));
-                session.setAttribute("userFullName", user.getString("full_name"));
-                session.setAttribute("userEmail", user.getString("email"));
-                session.setAttribute("userRole", user.getString("role"));
+                session.setAttribute("userId",    user.get("id"));
+                session.setAttribute("userName",  user.get("full_name"));
+                session.setAttribute("userEmail", user.get("email"));
+                session.setAttribute("userRole",  user.get("role"));
                 session.setMaxInactiveInterval(30 * 60);
 
-                String role = user.getString("role");
-
-                if (role.equals("admin")) {
-                    response.sendRedirect(request.getContextPath() + "/admin/dashboard");
-                } else if (role.equals("attendee")) {
-                    response.sendRedirect(request.getContextPath() + "/attendee/dashboard");
-                } else if (role.equals("volunteer")) {
-                    response.sendRedirect(request.getContextPath() + "/volunteer/dashboard");
-                } else {
-                    response.sendRedirect(request.getContextPath() + "/vendor/dashboard");
+                String role = (String) user.get("role");
+                switch (role) {
+                    case "admin":     response.sendRedirect(request.getContextPath() + "/admin/dashboard");     break;
+                    case "attendee":  response.sendRedirect(request.getContextPath() + "/attendee/dashboard");  break;
+                    case "volunteer": response.sendRedirect(request.getContextPath() + "/volunteer/dashboard"); break;
+                    default:          response.sendRedirect(request.getContextPath() + "/vendor/dashboard");    break;
                 }
 
-            } catch (Exception e) {
-                request.setAttribute("errorMessage", "Something went wrong. Please try again.");
+            } else {
+                userModel.recordLoginAttempt(email, false);
+                if (userModel.isLockedByAttempts(email)) {
+                    userModel.lockUser(email);
+                    request.setAttribute("errorMessage", "Too many failed attempts. Your account has been locked.");
+                } else {
+                    request.setAttribute("errorMessage", "Invalid email or password.");
+                }
                 request.getRequestDispatcher("/WEB-INF/pages/shared/login.jsp")
                        .forward(request, response);
             }
+
         } else {
             userModel.recordLoginAttempt(email, false);
-            request.setAttribute("errorMessage", 
-                "Invalid credentials or your account has been locked.");
+            request.setAttribute("errorMessage", "Invalid email or password.");
             request.getRequestDispatcher("/WEB-INF/pages/shared/login.jsp")
                    .forward(request, response);
         }

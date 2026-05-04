@@ -1,0 +1,140 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%
+    if (session.getAttribute("userRole") == null || !session.getAttribute("userRole").equals("attendee")) {
+        response.sendRedirect(request.getContextPath() + "/login");
+        return;
+    }
+%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Browse Events — EventFlow</title>
+  <link rel="stylesheet" href="/EventFlow/css/style.css"/>
+</head>
+<body>
+<div class="dashboard-container">
+
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <div class="sidebar-logo"><span></span><span></span><span></span><span></span></div>
+        <h2>EventFlow</h2>
+      </div>
+      <p>Attendee Panel</p>
+    </div>
+    <nav class="sidebar-nav">
+      <ul class="sidebar-menu">
+        <li><a href="/EventFlow/attendee/dashboard">Dashboard</a></li>
+        <li><a href="/EventFlow/attendee/events" class="active">Browse Events</a></li>
+        <li><a href="/EventFlow/attendee/myregistrations">My Registrations</a></li>
+        <li><a href="/EventFlow/attendee/profile">My Profile</a></li>
+        <li><a href="/EventFlow/logout">Logout</a></li>
+      </ul>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-avatar">${sessionScope.userName.substring(0,2).toUpperCase()}</div>
+      <div>
+        <div class="sidebar-user-name">${sessionScope.userName}</div>
+        <div class="sidebar-user-email">${sessionScope.userEmail}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="topbar">
+      <div class="breadcrumb">
+        <span class="breadcrumb-seg">Attendee</span>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-active">Browse Events</span>
+      </div>
+      <div class="topbar-spacer"></div>
+      <div class="topbar-right">
+        <a href="/EventFlow/logout" class="topbar-btn">Logout</a>
+      </div>
+    </div>
+
+    <div class="content-wrap">
+      <div class="page-header">
+        <div>
+          <h1>Browse Events</h1>
+          <p>Find and register for upcoming events</p>
+        </div>
+      </div>
+
+      <c:if test="${not empty successMsg}">
+        <div class="alert alert-success">${successMsg}</div>
+        <c:remove var="successMsg" scope="session"/>
+      </c:if>
+      <c:if test="${not empty errorMsg}">
+        <div class="alert alert-error">${errorMsg}</div>
+        <c:remove var="errorMsg" scope="session"/>
+      </c:if>
+
+      <div class="table-container">
+        <div class="table-header">
+          <span class="table-title">Available Events</span>
+          <span class="nav-badge">${events.size()} events</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Title</th>
+              <th>Location</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Capacity</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <c:forEach var="e" items="${events}" varStatus="s">
+              <tr>
+                <td class="td-hint">${s.count}</td>
+                <td class="td-primary">${e.title}</td>
+                <td class="td-secondary">${e.location}</td>
+                <td class="td-secondary">${e.event_date}</td>
+                <td class="td-secondary">${e.start_time} — ${e.end_time}</td>
+                <td class="td-secondary">${e.registered_count} / ${e.capacity}</td>
+                <td>
+                  <c:choose>
+                    <c:when test="${e.status == 'upcoming'}"><span class="badge badge-info">Upcoming</span></c:when>
+                    <c:when test="${e.status == 'ongoing'}"><span class="badge badge-success">Ongoing</span></c:when>
+                    <c:when test="${e.status == 'completed'}"><span class="badge badge-neutral">Completed</span></c:when>
+                    <c:otherwise><span class="badge badge-danger">Cancelled</span></c:otherwise>
+                  </c:choose>
+                </td>
+                <td>
+                  <c:choose>
+                    <c:when test="${e.is_registered}">
+                      <span class="badge badge-success">Registered</span>
+                    </c:when>
+                    <c:when test="${e.registered_count >= e.capacity}">
+                      <span class="badge badge-danger">Full</span>
+                    </c:when>
+                    <c:when test="${e.status == 'upcoming' || e.status == 'ongoing'}">
+                      <form method="post" action="/EventFlow/attendee/events">
+                        <input type="hidden" name="eventId" value="${e.id}"/>
+                        <button type="submit" class="btn-row">Register</button>
+                      </form>
+                    </c:when>
+                    <c:otherwise><span class="td-hint">—</span></c:otherwise>
+                  </c:choose>
+                </td>
+              </tr>
+            </c:forEach>
+            <c:if test="${empty events}">
+              <tr><td colspan="8" style="text-align:center;color:var(--text-ghost);padding:24px">No events available.</td></tr>
+            </c:if>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

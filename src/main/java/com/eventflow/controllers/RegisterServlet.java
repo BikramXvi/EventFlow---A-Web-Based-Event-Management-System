@@ -64,11 +64,10 @@ public class RegisterServlet extends HttpServlet {
                    .forward(request, response);
             return;
         }
-
         UserModel userModel = new UserModel();
-        String result = userModel.registerUser(fullName, email, phone, password, role);
+        boolean result = userModel.registerUser(fullName, email, phone, password, role);
 
-        if (result.equals("success")) {
+        if (result) {
             request.setAttribute("successMessage", 
                 "Registration successful! You can now log in.");
             request.getRequestDispatcher("/WEB-INF/pages/shared/login.jsp")

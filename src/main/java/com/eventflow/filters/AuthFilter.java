@@ -33,7 +33,8 @@ public class AuthFilter implements Filter {
                 || path.startsWith(contextPath + "/js/")
                 || path.startsWith(contextPath + "/images/")
                 || path.equals(contextPath + "/")
-                || path.equals(contextPath + "/index.jsp");
+                || path.equals(contextPath + "/index.jsp")
+                || path.startsWith(contextPath + "/WEB-INF/pages/landing/");
 
         boolean isLoggedIn = (session != null 
                 && session.getAttribute("userId") != null);
