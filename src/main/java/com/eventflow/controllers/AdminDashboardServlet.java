@@ -19,68 +19,75 @@ import java.util.List;
 @WebServlet("/admin/dashboard")
 public class AdminDashboardServlet extends HttpServlet {
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+	        throws ServletException, IOException {
 
-        try (Connection conn = DBConfig.getConnection()) {
+	    try (Connection conn = DBConfig.getConnection()) {
 
-            // Get total users count
-            PreparedStatement userStmt = conn.prepareStatement(
-                "SELECT COUNT(*) FROM users WHERE role != 'admin'");
-            ResultSet userRs = userStmt.executeQuery();
-            int totalUsers = 0;
-            if (userRs.next()) totalUsers = userRs.getInt(1);
+	        int totalUsers = 0;
+	        int totalEvents = 0;
+	        int upcomingEvents = 0;
+	        int totalRegistrations = 0;
 
-            // Get total events count
-            PreparedStatement eventStmt = conn.prepareStatement(
-                "SELECT COUNT(*) FROM events");
-            ResultSet eventRs = eventStmt.executeQuery();
-            int totalEvents = 0;
-            if (eventRs.next()) totalEvents = eventRs.getInt(1);
+	        // USERS
+	        try (PreparedStatement stmt = conn.prepareStatement(
+	                "SELECT COUNT(*) FROM users WHERE role != 'admin'");
+	             ResultSet rs = stmt.executeQuery()) {
+	            if (rs.next()) totalUsers = rs.getInt(1);
+	        }
 
-            // Get upcoming events count
-            PreparedStatement upcomingStmt = conn.prepareStatement(
-                "SELECT COUNT(*) FROM events WHERE status = 'upcoming'");
-            ResultSet upcomingRs = upcomingStmt.executeQuery();
-            int upcomingEvents = 0;
-            if (upcomingRs.next()) upcomingEvents = upcomingRs.getInt(1);
+	        // EVENTS
+	        try (PreparedStatement stmt = conn.prepareStatement(
+	                "SELECT COUNT(*) FROM events");
+	             ResultSet rs = stmt.executeQuery()) {
+	            if (rs.next()) totalEvents = rs.getInt(1);
+	        }
 
-            // Get total registrations count
-            PreparedStatement regStmt = conn.prepareStatement(
-                "SELECT COUNT(*) FROM event_registrations WHERE status = 'confirmed'");
-            ResultSet regRs = regStmt.executeQuery();
-            int totalRegistrations = 0;
-            if (regRs.next()) totalRegistrations = regRs.getInt(1);
+	        // UPCOMING EVENTS
+	        try (PreparedStatement stmt = conn.prepareStatement(
+	                "SELECT COUNT(*) FROM events WHERE status = 'upcoming'");
+	             ResultSet rs = stmt.executeQuery()) {
+	            if (rs.next()) upcomingEvents = rs.getInt(1);
+	        }
 
-            // Get recent events list
-            PreparedStatement recentStmt = conn.prepareStatement(
-                "SELECT id, title, location, event_date, status FROM events " +
-                "ORDER BY created_at DESC LIMIT 5");
-            ResultSet recentRs = recentStmt.executeQuery();
-            List<String[]> recentEvents = new ArrayList<>();
-            while (recentRs.next()) {
-                String[] row = {
-                    recentRs.getString("id"),
-                    recentRs.getString("title"),
-                    recentRs.getString("location"),
-                    recentRs.getString("event_date"),
-                    recentRs.getString("status")
-                };
-                recentEvents.add(row);
-            }
+	        // REGISTRATIONS
+	        try (PreparedStatement stmt = conn.prepareStatement(
+	                "SELECT COUNT(*) FROM event_registrations WHERE status = 'confirmed'");
+	             ResultSet rs = stmt.executeQuery()) {
+	            if (rs.next()) totalRegistrations = rs.getInt(1);
+	        }
 
-            request.setAttribute("totalUsers", totalUsers);
-            request.setAttribute("totalEvents", totalEvents);
-            request.setAttribute("upcomingEvents", upcomingEvents);
-            request.setAttribute("totalRegistrations", totalRegistrations);
-            request.setAttribute("recentEvents", recentEvents);
+	        // RECENT EVENTS
+	        List<String[]> recentEvents = new ArrayList<>();
 
-        } catch (Exception e) {
-            System.out.println("Admin dashboard error: " + e.getMessage());
-        }
+	        try (PreparedStatement stmt = conn.prepareStatement(
+	                "SELECT id, title, location, event_date, status FROM events " +
+	                "ORDER BY created_at DESC LIMIT 5");
+	             ResultSet rs = stmt.executeQuery()) {
 
-        request.getRequestDispatcher("/WEB-INF/pages/admin/adminDashboard.jsp")
-               .forward(request, response);
-    }
+	            while (rs.next()) {
+	                recentEvents.add(new String[]{
+	                        rs.getString("id"),
+	                        rs.getString("title"),
+	                        rs.getString("location"),
+	                        rs.getString("event_date"),
+	                        rs.getString("status")
+	                });
+	            }
+	        }
+
+	        request.setAttribute("totalUsers", totalUsers);
+	        request.setAttribute("totalEvents", totalEvents);
+	        request.setAttribute("upcomingEvents", upcomingEvents);
+	        request.setAttribute("totalRegistrations", totalRegistrations);
+	        request.setAttribute("recentEvents", recentEvents);
+
+	    } catch (Exception e) {
+	        System.out.println("Admin dashboard error: " + e.getMessage());
+	    }
+
+	    request.getRequestDispatcher("/WEB-INF/pages/admin/adminDashboard.jsp")
+	            .forward(request, response);
+	}
 }

@@ -1,5 +1,5 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,6 +23,7 @@
     <span class="nav-brand-name">EventFlow</span>
   </a>
   <div class="nav-links">
+    <a href="/EventFlow/events">Browse Events</a>
     <a href="#features">Features</a>
     <a href="#how">How it works</a>
     <a href="#pricing">Pricing</a>
@@ -40,6 +41,7 @@
 
 <!-- Mobile nav -->
 <div class="mobile-nav" id="mobileNav">
+  <a href="/EventFlow/events">Browse Events</a>
   <a href="#features">Features</a>
   <a href="#how">How it works</a>
   <a href="#pricing">Pricing</a>
@@ -74,6 +76,7 @@
         Start for free
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
       </a>
+      <a href="/EventFlow/events" class="btn-cta-ghost">Browse Events</a>
       <a href="#features" class="btn-cta-ghost">See features</a>
     </div>
     <div class="hero-stats reveal reveal-delay-4">
@@ -492,6 +495,7 @@
     <div class="footer-col">
       <div class="footer-col-title">Product</div>
       <div class="footer-links">
+        <a href="/EventFlow/events">Browse Events</a>
         <a href="#features">Features</a>
         <a href="#how">How it works</a>
         <a href="#pricing">Pricing</a>

@@ -2,76 +2,126 @@ package com.eventflow.controllers;
 
 import com.eventflow.model.EventModel;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import jakarta.servlet.http.*;
 
-/**
- * Handles editing an existing event.
- * GET  -> loads event data into edit form
- * POST -> saves updated event to database
- */
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.*;
+import java.util.UUID;
+import java.io.File;
+
 @WebServlet("/admin/editEvent")
+@MultipartConfig(
+        maxFileSize = 5 * 1024 * 1024,
+        maxRequestSize = 6 * 1024 * 1024
+)
 public class EditEventServlet extends HttpServlet {
 
+    private final EventModel eventModel = new EventModel();
+
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void doGet(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
 
-        int eventId = Integer.parseInt(request.getParameter("id"));
-        EventModel eventModel = new EventModel();
-        String[] event = eventModel.getEventById(eventId);
+        int id = Integer.parseInt(req.getParameter("id"));
+
+        String[] event = eventModel.getEventById(id);
 
         if (event == null) {
-            response.sendRedirect(request.getContextPath() + "/admin/events");
+            res.sendRedirect(req.getContextPath() + "/admin/events");
             return;
         }
 
-        request.setAttribute("event", event);
-        request.getRequestDispatcher("/WEB-INF/pages/admin/editEvent.jsp")
-               .forward(request, response);
+        req.setAttribute("event", event);
+        req.getRequestDispatcher("/WEB-INF/pages/admin/editEvent.jsp").forward(req, res);
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
 
-        int eventId = Integer.parseInt(request.getParameter("eventId"));
-        String title = request.getParameter("title").trim();
-        String description = request.getParameter("description").trim();
-        String location = request.getParameter("location").trim();
-        String eventDate = request.getParameter("eventDate").trim();
-        String startTime = request.getParameter("startTime").trim();
-        String endTime = request.getParameter("endTime").trim();
-        int capacity = Integer.parseInt(request.getParameter("capacity").trim());
-        String status = request.getParameter("status").trim();
+        req.setCharacterEncoding("UTF-8");
 
-        if (title.isEmpty() || description.isEmpty() || location.isEmpty()
-                || eventDate.isEmpty() || startTime.isEmpty() || endTime.isEmpty()) {
-            request.setAttribute("errorMessage", "All fields are required.");
-            request.setAttribute("event", new String[]{
-                String.valueOf(eventId), title, description, location,
-                eventDate, startTime, endTime,
-                String.valueOf(capacity), status
-            });
-            request.getRequestDispatcher("/WEB-INF/pages/admin/editEvent.jsp")
-                   .forward(request, response);
+        int id = Integer.parseInt(req.getParameter("id"));
+
+        String title       = trim(req.getParameter("title"));
+        String description = trim(req.getParameter("description"));
+        String location    = trim(req.getParameter("location"));
+        String eventDate   = trim(req.getParameter("eventDate"));
+        String startTime   = trim(req.getParameter("startTime"));
+        String endTime     = trim(req.getParameter("endTime"));
+        String capacity    = trim(req.getParameter("capacity"));
+        String status      = trim(req.getParameter("status"));
+
+        if (title.isEmpty() || location.isEmpty() || eventDate.isEmpty()
+                || startTime.isEmpty() || endTime.isEmpty() || capacity.isEmpty()) {
+
+            req.setAttribute("errorMsg", "All fields are required.");
+            doGet(req, res);
             return;
         }
 
-        EventModel eventModel = new EventModel();
-        boolean updated = eventModel.updateEvent(eventId, title, description,
-                                                  location, eventDate, startTime,
-                                                  endTime, capacity, status);
+        // OPTIONAL IMAGE UPDATE (safe way)
+        Part filePart = req.getPart("eventImage");
+        String imagePath = null;
+
+        if (filePart != null && filePart.getSize() > 0) {
+            imagePath = saveImage(filePart);
+            eventModel.updateImagePath(id, imagePath);
+        }
+
+        boolean updated = eventModel.updateEvent(
+                id,
+                title,
+                description,
+                location,
+                eventDate,
+                startTime,
+                endTime,
+                Integer.parseInt(capacity),
+                status,
+                null // imagePath ignored in your updateEvent anyway
+        );
 
         if (updated) {
-            response.sendRedirect(request.getContextPath() + "/admin/events");
+            res.sendRedirect(req.getContextPath() + "/admin/events");
         } else {
-            request.setAttribute("errorMessage", "Failed to update event.");
-            request.getRequestDispatcher("/WEB-INF/pages/admin/editEvent.jsp")
-                   .forward(request, response);
+            req.setAttribute("errorMsg", "Failed to update event.");
+            doGet(req, res);
         }
+    }
+
+    private String saveImage(Part filePart) {
+        try {
+            String contentType = filePart.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) return null;
+
+            String ext = contentType.contains("png") ? ".png"
+                    : contentType.contains("gif") ? ".gif"
+                    : ".jpg";
+
+            String filename = "evt_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12) + ext;
+
+            String uploadDir = getServletContext().getRealPath("/")
+                    + "uploads" + File.separator + "events";
+
+            Files.createDirectories(Paths.get(uploadDir));
+
+            try (InputStream in = filePart.getInputStream()) {
+                Files.copy(in, Paths.get(uploadDir, filename), StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            return filename;
+
+        } catch (Exception e) {
+            System.out.println("Image upload error: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private String trim(String s) {
+        return s == null ? "" : s.trim();
     }
 }

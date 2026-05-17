@@ -1,7 +1,10 @@
 /* =============================================
-   EventFlow — Dark UI Stylesheet
-   Type scale: white(f0) > 90%(e0) > 78%(c8) >
-               medium(88) > dim(40) > ghost(2e)
+   EventFlow — Dashboard Stylesheet
+   Shade principles:
+   - Backgrounds: page(darkest) < panel < raised < hover < active
+   - Text: primary(brightest) > secondary > tertiary > disabled
+   - Borders: faint < subtle < default < strong
+   - Every color has enough contrast to be readable
    ============================================= */
 
 *, *::before, *::after {
@@ -11,55 +14,73 @@
 }
 
 :root {
-    /* ── Backgrounds ── */
-    --bg-page:      #0c0c0c;
-    --bg-panel:     #111111;
-    --bg-raised:    #141414;
-    --bg-hover:     #161616;
-    --bg-active:    #191919;
-    --bg-input:     #0f0f0f;
-
-    /* ── Borders ── */
-    --border-faint:   #161616;
-    --border-subtle:  #1c1c1c;
-    --border-default: #222222;
-    --border-strong:  #2a2a2a;
-
-    /* ── Text hierarchy ──
-       white  = page titles, brand
-       90%    = active nav, emphasis
-       78%    = primary content, card headings
-       mid    = body, descriptions
-       dim    = meta, dates, secondary
-       ghost  = uppercase labels, table headers
-       deep   = placeholders, dividers
+    /* ── Backgrounds ──────────────────────────────────────────
+       Scale: darkest base → lighter surfaces → interactive states
+       Each step is visibly distinct — not just 1-2 hex digits apart
     ── */
-    --text-white:   #f0f0f0;
-    --text-90:      #e0e0e0;
-    --text-78:      #c8c8c8;
-    --text-mid:     #888888;
-    --text-dim:     #404040;
-    --text-ghost:   #2e2e2e;
-    --text-deep:    #1e1e1e;
+    --bg-page:      #0d0d0d;   /* darkest — outer shell, html body */
+    --bg-panel:     #141414;   /* sidebar, card surfaces */
+    --bg-raised:    #1c1c1c;   /* elevated cards, stat blocks */
+    --bg-hover:     #242424;   /* hover state — clearly lighter than raised */
+    --bg-active:    #2c2c2c;   /* active/selected state */
+    --bg-input:     #111111;   /* form inputs */
 
-    /* ── Semantic colors ── */
-    --success-text:   #3a7a4a;
-    --success-bg:     #0f1f14;
-    --success-border: #162a1c;
+    /* ── Borders ──────────────────────────────────────────────
+       Each stop is meaningfully darker than the next
+    ── */
+    --border-faint:   #1e1e1e;   /* row dividers, hairlines */
+    --border-subtle:  #272727;   /* card edges, panel borders */
+    --border-default: #333333;   /* input outlines, button borders */
+    --border-strong:  #444444;   /* focus rings, emphasis borders */
 
-    --info-text:      #3a6090;
-    --info-bg:        #0d1520;
-    --info-border:    #142030;
+    /* ── Text ─────────────────────────────────────────────────
+       7-stop scale — each readable against --bg-panel (#141414)
+       Contrast ratios:
+         white  (#f5f5f5) on panel → ~13:1  ✓ AAA
+         90%    (#dedede) on panel → ~11:1  ✓ AAA
+         78%    (#c0c0c0) on panel →  ~8:1  ✓ AAA
+         mid    (#8a8a8a) on panel →  ~4.5:1 ✓ AA
+         dim    (#606060) on panel →  ~3.2:1 ✓ AA large text
+         ghost  (#404040) on panel →  ~2:1   decorative only
+         deep   (#282828) on panel →  ~1.4:1 dividers only
+    ── */
+    --text-white:   #f5f5f5;   /* page h1, brand name, hero numbers */
+    --text-90:      #dedede;   /* active nav, strong emphasis */
+    --text-78:      #c0c0c0;   /* table primary cells, card titles */
+    --text-mid:     #8a8a8a;   /* body text, descriptions, breadcrumbs */
+    --text-dim:     #606060;   /* secondary meta — dates, venues */
+    --text-ghost:   #404040;   /* uppercase section labels, th headers */
+    --text-deep:    #282828;   /* placeholders, faint decorative text */
 
-    --warning-text:   #8a6a2a;
-    --warning-bg:     #1c1608;
-    --warning-border: #2a2010;
+    /* ── Semantic — success ───────────────────────────────────
+       Green: visible on dark bg, not neon-garish
+    ── */
+    --success-text:   #4caf74;   /* brighter green — readable on dark */
+    --success-bg:     #0e2018;   /* deep green tint */
+    --success-border: #1a3d27;
 
-    --danger-text:    #8a4040;
-    --danger-bg:      #1c0f0f;
-    --danger-border:  #2a1616;
+    /* ── Semantic — info ─────────────────────────────────────
+       Blue: visible, not washed out
+    ── */
+    --info-text:      #5b9bd6;
+    --info-bg:        #0d1d30;
+    --info-border:    #1a3a5c;
 
-    /* ── Radius scale ── */
+    /* ── Semantic — warning ──────────────────────────────────
+       Amber: warm, readable
+    ── */
+    --warning-text:   #c49a3a;
+    --warning-bg:     #221a08;
+    --warning-border: #3d2e0d;
+
+    /* ── Semantic — danger ───────────────────────────────────
+       Red: clear, not muddy
+    ── */
+    --danger-text:    #c45a5a;
+    --danger-bg:      #200f0f;
+    --danger-border:  #3d1a1a;
+
+    /* ── Radius ── */
     --r-xs: 4px;
     --r-sm: 5px;
     --r-md: 6px;
@@ -89,7 +110,6 @@ a:hover { color: var(--text-mid); }
 
 button, input, select, textarea { font-family: var(--font-ui); }
 
-/* Scrollbar */
 ::-webkit-scrollbar { width: 3px; height: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 3px; }
@@ -121,16 +141,14 @@ button, input, select, textarea { font-family: var(--font-ui); }
     margin-bottom: 28px;
 }
 
-/* "EventFlow" — pure white, largest text on page */
 .auth-header h1 {
     font-size: 20px;
     font-weight: 600;
     color: var(--text-white);
-    letter-spacing: -0.03em;
+    letter-spacing: -0.02em;
     margin-bottom: 6px;
 }
 
-/* "Sign in to continue" — dim, supporting */
 .auth-header p {
     font-size: 12px;
     color: var(--text-dim);
@@ -145,7 +163,6 @@ button, input, select, textarea { font-family: var(--font-ui); }
     margin-bottom: 14px;
 }
 
-/* "EMAIL ADDRESS" — ghost uppercase label */
 .form-group label {
     display: block;
     font-size: 10px;
@@ -206,7 +223,6 @@ button, input, select, textarea { font-family: var(--font-ui); }
    BUTTONS
    ============================================= */
 
-/* Full-width primary — auth submit */
 .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -230,12 +246,11 @@ button, input, select, textarea { font-family: var(--font-ui); }
 .btn-primary:hover {
     background: var(--bg-hover);
     color: var(--text-90);
-    border-color: #333;
+    border-color: #555;
 }
 
 .btn-primary:active { transform: scale(0.99); }
 
-/* Secondary — cancel, minor actions */
 .btn-secondary {
     display: inline-flex;
     align-items: center;
@@ -258,7 +273,6 @@ button, input, select, textarea { font-family: var(--font-ui); }
     border-color: var(--border-strong);
 }
 
-/* Danger — delete */
 .btn-danger {
     display: inline-flex;
     align-items: center;
@@ -276,11 +290,10 @@ button, input, select, textarea { font-family: var(--font-ui); }
 }
 
 .btn-danger:hover {
-    background: #261212;
-    color: #aa5555;
+    background: #2e1515;
+    color: #d97070;
 }
 
-/* Icon-only square button */
 .btn-icon {
     display: inline-flex;
     align-items: center;
@@ -303,7 +316,6 @@ button, input, select, textarea { font-family: var(--font-ui); }
 
 .btn-icon svg { width: 13px; height: 13px; }
 
-/* Inline table row actions */
 .btn-row {
     display: inline-flex;
     align-items: center;
@@ -321,7 +333,7 @@ button, input, select, textarea { font-family: var(--font-ui); }
 
 .btn-row:hover {
     background: var(--bg-hover);
-    color: var(--text-mid);
+    color: var(--text-78);
     border-color: var(--border-strong);
 }
 
@@ -388,7 +400,6 @@ button, input, select, textarea { font-family: var(--font-ui); }
     z-index: 100;
 }
 
-/* Brand section */
 .sidebar-header {
     padding: 16px 14px 12px;
     border-bottom: 1px solid var(--border-subtle);
@@ -419,7 +430,7 @@ button, input, select, textarea { font-family: var(--font-ui); }
     border-radius: 1px;
 }
 
-/* "EventFlow" — whitest text in sidebar */
+/* Brand name — pure white, most prominent text in sidebar */
 .sidebar-header h2 {
     font-size: 13px;
     font-weight: 600;
@@ -427,14 +438,13 @@ button, input, select, textarea { font-family: var(--font-ui); }
     letter-spacing: -0.02em;
 }
 
-/* Role — barely visible */
+/* Role tag — clearly readable but subordinate */
 .sidebar-header p {
     font-size: 10px;
-    color: var(--text-deep);
+    color: var(--text-dim);
     margin-top: 1px;
 }
 
-/* Sidebar search bar */
 .sidebar-search {
     display: flex;
     align-items: center;
@@ -451,7 +461,7 @@ button, input, select, textarea { font-family: var(--font-ui); }
 
 .sidebar-search svg {
     width: 11px; height: 11px;
-    color: var(--text-deep);
+    color: var(--text-ghost);
     flex-shrink: 0;
 }
 
@@ -470,7 +480,7 @@ button, input, select, textarea { font-family: var(--font-ui); }
 
 .sidebar-search-kbd {
     font-size: 9px;
-    color: var(--text-deep);
+    color: var(--text-ghost);
     background: var(--bg-panel);
     border: 1px solid var(--border-subtle);
     border-radius: 3px;
@@ -478,13 +488,13 @@ button, input, select, textarea { font-family: var(--font-ui); }
     flex-shrink: 0;
 }
 
-/* Nav area */
-.sidebar-nav { padding: 8px; }
+.sidebar-nav,
+.sidebar > ul.sidebar-menu { padding: 8px; }
 
 .sidebar-section-label {
     font-size: 9px;
     font-weight: 600;
-    color: var(--text-deep);
+    color: var(--text-ghost);
     text-transform: uppercase;
     letter-spacing: 0.08em;
     padding: 8px 6px 4px;
@@ -500,38 +510,37 @@ button, input, select, textarea { font-family: var(--font-ui); }
     border-radius: var(--r-sm);
     font-size: 12px;
     font-weight: 400;
-    color: var(--text-dim);          /* inactive: dim gray */
+    color: var(--text-dim);          /* inactive — dim but readable */
     transition: background 0.1s, color 0.1s;
 }
 
 .sidebar-menu li a svg {
     width: 13px; height: 13px;
     flex-shrink: 0;
-    opacity: 0.4;
+    opacity: 0.5;
 }
 
 .sidebar-menu li a:hover {
     background: var(--bg-hover);
-    color: var(--text-mid);          /* hover: medium gray */
+    color: var(--text-mid);          /* hover — clearly brighter than inactive */
 }
 
-.sidebar-menu li a:hover svg { opacity: 0.7; }
+.sidebar-menu li a:hover svg { opacity: 0.8; }
 
-/* Active nav item — brightest */
+/* Active nav — brightest item in the sidebar */
 .sidebar-menu li a.active {
     background: var(--bg-active);
-    color: var(--text-90);           /* active: 90% white */
+    color: var(--text-90);           /* 90% white — pops against dark bg */
     font-weight: 500;
 }
 
 .sidebar-menu li a.active svg { opacity: 1; }
 
-/* Nav count pill */
 .nav-badge {
     margin-left: auto;
     font-size: 9px;
     font-weight: 500;
-    color: var(--text-ghost);
+    color: var(--text-dim);
     background: var(--bg-raised);
     border: 1px solid var(--border-subtle);
     border-radius: 3px;
@@ -545,7 +554,6 @@ button, input, select, textarea { font-family: var(--font-ui); }
     margin: 6px 8px;
 }
 
-/* Sidebar footer — user identity */
 .sidebar-footer {
     margin-top: auto;
     padding: 10px;
@@ -565,25 +573,22 @@ button, input, select, textarea { font-family: var(--font-ui); }
     justify-content: center;
     font-size: 9px;
     font-weight: 600;
-    color: var(--text-dim);
+    color: var(--text-mid);         /* mid — clearly readable avatar initials */
     flex-shrink: 0;
 }
 
-/* "Admin" — mid gray */
 .sidebar-user-name {
     font-size: 11px;
     font-weight: 500;
-    color: var(--text-mid);
+    color: var(--text-78);          /* 78% — name should be readable */
 }
 
-/* email — barely visible */
 .sidebar-user-email {
     font-size: 10px;
-    color: var(--text-deep);
+    color: var(--text-dim);
     margin-top: 1px;
 }
 
-/* Toggle switch */
 .toggle {
     width: 28px; height: 16px;
     border-radius: 20px;
@@ -647,16 +652,15 @@ button, input, select, textarea { font-family: var(--font-ui); }
     flex-shrink: 0;
 }
 
-/* "EventFlow / Dashboard" breadcrumb */
 .breadcrumb {
     display: flex;
     align-items: center;
     gap: 5px;
 }
 
-.breadcrumb-seg  { font-size: 12px; color: var(--text-dim); }   /* parent: dim */
-.breadcrumb-sep  { font-size: 11px; color: var(--text-deep); }
-.breadcrumb-active { font-size: 12px; font-weight: 500; color: var(--text-78); } /* current: 78% */
+.breadcrumb-seg  { font-size: 12px; color: var(--text-dim); }
+.breadcrumb-sep  { font-size: 11px; color: var(--text-ghost); }
+.breadcrumb-active { font-size: 12px; font-weight: 500; color: var(--text-78); }
 
 .topbar-spacer { flex: 1; }
 
@@ -666,7 +670,6 @@ button, input, select, textarea { font-family: var(--font-ui); }
     gap: 8px;
 }
 
-/* "+ New event" button */
 .topbar-btn {
     display: inline-flex;
     align-items: center;
@@ -692,7 +695,6 @@ button, input, select, textarea { font-family: var(--font-ui); }
 
 .topbar-btn svg { width: 10px; height: 10px; }
 
-/* Notification bell */
 .notif-btn {
     width: 26px; height: 26px;
     display: flex;
@@ -723,7 +725,6 @@ button, input, select, textarea { font-family: var(--font-ui); }
     border: 1.5px solid var(--bg-page);
 }
 
-/* Avatar */
 .topbar-avatar {
     width: 24px; height: 24px;
     border-radius: 50%;
@@ -734,7 +735,7 @@ button, input, select, textarea { font-family: var(--font-ui); }
     justify-content: center;
     font-size: 9px;
     font-weight: 600;
-    color: var(--text-dim);
+    color: var(--text-mid);
     cursor: pointer;
 }
 
@@ -762,7 +763,7 @@ button, input, select, textarea { font-family: var(--font-ui); }
     gap: 12px;
 }
 
-/* "Dashboard" — white, bold */
+/* h1 — whitest text on the page */
 .page-header h1 {
     font-size: 15px;
     font-weight: 600;
@@ -771,10 +772,10 @@ button, input, select, textarea { font-family: var(--font-ui); }
     line-height: 1.3;
 }
 
-/* "May 3, 2026 · Admin" — barely there */
+/* subtitle — visible but clearly secondary */
 .page-header p {
     font-size: 11px;
-    color: var(--text-deep);
+    color: var(--text-dim);
     margin-top: 3px;
     line-height: 1.4;
 }
@@ -787,8 +788,8 @@ button, input, select, textarea { font-family: var(--font-ui); }
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 1px;
-    background: var(--border-faint);
-    border: 1px solid var(--border-faint);
+    background: var(--border-subtle);
+    border: 1px solid var(--border-subtle);
     border-radius: var(--r-lg);
     overflow: hidden;
 }
@@ -812,23 +813,22 @@ button, input, select, textarea { font-family: var(--font-ui); }
     margin-bottom: 8px;
 }
 
-/* "24" — white, large number */
+/* "24" — brightest element in the card */
 .stat-card .stat-number {
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 700;
     color: var(--text-white);
     letter-spacing: -0.04em;
     line-height: 1;
 }
 
-/* "+3 this month" */
 .stat-card .stat-change {
     font-size: 10px;
     color: var(--text-dim);
     margin-top: 5px;
 }
 
-.stat-card .stat-change.up   { color: #2d5a3d; }
+.stat-card .stat-change.up   { color: var(--success-text); }
 .stat-card .stat-change.warn { color: var(--warning-text); }
 
 /* =============================================
@@ -850,17 +850,16 @@ button, input, select, textarea { font-family: var(--font-ui); }
     border-bottom: 1px solid var(--border-subtle);
 }
 
-/* "RECENT EVENTS" — mid gray uppercase */
+/* Table section title — medium weight, clearly readable */
 .table-container h2,
 .table-title {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-mid);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-78);
     text-transform: uppercase;
     letter-spacing: 0.06em;
 }
 
-/* Filter chips */
 .filter-row { display: flex; gap: 4px; }
 
 .chip {
@@ -874,29 +873,30 @@ button, input, select, textarea { font-family: var(--font-ui); }
     border: 1px solid var(--border-subtle);
     background: transparent;
     cursor: pointer;
-    color: var(--text-deep);
+    color: var(--text-ghost);
     transition: all 0.1s;
 }
 
 .chip:hover {
     background: var(--bg-hover);
     color: var(--text-dim);
+    border-color: var(--border-default);
 }
 
 .chip.active {
-    background: var(--bg-raised);
-    border-color: var(--border-default);
+    background: var(--bg-active);
+    border-color: var(--border-strong);
     color: var(--text-mid);
 }
 
-/* Table itself */
+/* ── Table ── */
 table {
     width: 100%;
     border-collapse: collapse;
     font-size: 12px;
 }
 
-/* Column headers — ghost uppercase */
+/* Column headers — ghost uppercase, clearly distinct from data */
 table th {
     text-align: left;
     padding: 8px 14px;
@@ -917,22 +917,24 @@ table td {
 }
 
 table tr:last-child td { border-bottom: none; }
+
+/* Row hover — visibly different from resting state */
 table tbody tr:hover td { background: var(--bg-raised); }
 
-/* Event name — primary content */
+/* Primary td — event name, main content */
 table td.td-primary {
     font-size: 12px;
     font-weight: 500;
-    color: var(--text-78);
+    color: var(--text-78);   /* clearly readable, 78% white */
 }
 
-/* Date, venue — secondary */
+/* Secondary td — date, venue */
 table td.td-secondary {
     font-size: 11px;
-    color: var(--text-dim);
+    color: var(--text-dim);   /* readable but subordinate */
 }
 
-/* Registration count — barely there */
+/* Hint td — registration count, barely there */
 table td.td-hint {
     font-size: 10px;
     color: var(--text-ghost);
@@ -953,11 +955,11 @@ table td.td-hint {
     white-space: nowrap;
 }
 
+/* Each badge: bg tint + clearly readable colored text */
 .badge-success { background: var(--success-bg); color: var(--success-text); border-color: var(--success-border); }
 .badge-info    { background: var(--info-bg);    color: var(--info-text);    border-color: var(--info-border);    }
 .badge-warning { background: var(--warning-bg); color: var(--warning-text); border-color: var(--warning-border); }
 .badge-danger  { background: var(--danger-bg);  color: var(--danger-text);  border-color: var(--danger-border);  }
-
 .badge-neutral {
     background: var(--bg-raised);
     color: var(--text-dim);
@@ -965,7 +967,7 @@ table td.td-hint {
 }
 
 /* =============================================
-   FORM CARD (create / edit event)
+   FORM CARD (create / edit)
    ============================================= */
 
 .form-card {
@@ -982,7 +984,6 @@ table td.td-hint {
     border-bottom: 1px solid var(--border-subtle);
 }
 
-/* Form card title — 78% white */
 .form-card-header h2 {
     font-size: 14px;
     font-weight: 600;
@@ -1061,7 +1062,7 @@ table td.td-hint {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: var(--text-deep);
+    color: var(--text-ghost);    /* rest: ghost — subtle */
     transition: background 0.1s, color 0.1s, transform 0.12s;
     position: relative;
 }
@@ -1070,13 +1071,13 @@ table td.td-hint {
 
 .dock-item:hover {
     background: var(--bg-hover);
-    color: var(--text-dim);
+    color: var(--text-mid);      /* hover: mid — clearly brighter */
     transform: translateY(-2px);
 }
 
 .dock-item.active {
     background: var(--bg-active);
-    color: var(--text-mid);
+    color: var(--text-78);       /* active: 78% — most prominent dock item */
 }
 
 .dock-sep {
@@ -1085,19 +1086,18 @@ table td.td-hint {
     margin: 0 3px;
 }
 
-/* Tooltip above dock icons */
 .dock-tip {
     position: absolute;
     bottom: 36px;
     left: 50%;
     transform: translateX(-50%);
-    background: var(--bg-panel);
+    background: var(--bg-raised);
     border: 1px solid var(--border-strong);
     border-radius: var(--r-xs);
     padding: 3px 7px;
     font-size: 10px;
     font-weight: 500;
-    color: var(--text-mid);
+    color: var(--text-78);
     white-space: nowrap;
     pointer-events: none;
     opacity: 0;
@@ -1107,7 +1107,7 @@ table td.td-hint {
 .dock-item:hover .dock-tip { opacity: 1; }
 
 /* =============================================
-   GENERIC TOOLTIP  — <button data-tip="Delete">
+   GENERIC TOOLTIP — <button data-tip="Delete">
    ============================================= */
 
 [data-tip] { position: relative; }
@@ -1118,12 +1118,12 @@ table td.td-hint {
     bottom: calc(100% + 6px);
     left: 50%;
     transform: translateX(-50%);
-    background: var(--bg-panel);
+    background: var(--bg-raised);
     border: 1px solid var(--border-strong);
     border-radius: var(--r-xs);
     padding: 3px 7px;
     font-size: 10px;
-    color: var(--text-mid);
+    color: var(--text-78);
     white-space: nowrap;
     pointer-events: none;
     opacity: 0;

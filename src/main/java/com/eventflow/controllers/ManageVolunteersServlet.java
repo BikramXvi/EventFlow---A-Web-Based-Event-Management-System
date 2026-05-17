@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 @WebServlet("/admin/volunteers")
 public class ManageVolunteersServlet extends HttpServlet {
@@ -18,8 +20,10 @@ public class ManageVolunteersServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
-        req.setAttribute("volunteers", volunteerModel.getAllVolunteers());
-        req.setAttribute("events", eventModel.getAllEvents());
+        req.setAttribute("volunteers",   volunteerModel.getAllVolunteers());
+        req.setAttribute("events",       eventModel.getAllEvents());
+        req.setAttribute("assignments",  volunteerModel.getAllAssignments());
+        req.setAttribute("tasksByAssignment", volunteerModel.getAllTasksByAssignment());
         req.getRequestDispatcher("/WEB-INF/pages/admin/manageVolunteers.jsp").forward(req, res);
     }
 
@@ -32,9 +36,22 @@ public class ManageVolunteersServlet extends HttpServlet {
             int eventId     = Integer.parseInt(req.getParameter("eventId"));
             int volunteerId = Integer.parseInt(req.getParameter("volunteerId"));
             volunteerModel.assignVolunteer(eventId, volunteerId);
+
         } else if ("remove".equals(action)) {
             int assignmentId = Integer.parseInt(req.getParameter("assignmentId"));
             volunteerModel.removeAssignment(assignmentId);
+
+        } else if ("addTask".equals(action)) {
+            int    assignmentId  = Integer.parseInt(req.getParameter("assignmentId"));
+            String taskTitle     = req.getParameter("taskTitle");
+            String taskDesc      = req.getParameter("taskDescription");
+            if (taskTitle != null && !taskTitle.trim().isEmpty()) {
+                volunteerModel.addTask(assignmentId, taskTitle, taskDesc);
+            }
+
+        } else if ("removeTask".equals(action)) {
+            int taskId = Integer.parseInt(req.getParameter("taskId"));
+            volunteerModel.removeTask(taskId);
         }
 
         res.sendRedirect(req.getContextPath() + "/admin/volunteers");

@@ -1,5 +1,5 @@
 package com.eventflow.controllers;
-
+import org.mindrot.jbcrypt.BCrypt;
 import com.eventflow.model.UserModel;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -65,7 +65,17 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
         UserModel userModel = new UserModel();
-        boolean result = userModel.registerUser(fullName, email, phone, password, role);
+
+     // HASH PASSWORD BEFORE SAVING
+     String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+
+     boolean result = userModel.registerUser(
+             fullName,
+             email,
+             phone,
+             hashedPassword,
+             role
+     );
 
         if (result) {
             request.setAttribute("successMessage", 

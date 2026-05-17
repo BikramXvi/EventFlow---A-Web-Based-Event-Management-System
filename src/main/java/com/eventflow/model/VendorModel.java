@@ -91,13 +91,13 @@ public class VendorModel {
         return list;
     }
 
-    // ── Apply for event (vendor) ───────────────────────────────
-    public boolean apply(int eventId, int vendorId) {
-        String sql = "INSERT INTO vendor_applications (event_id, vendor_id) VALUES (?, ?)";
+    public boolean apply(int eventId, int vendorId, String serviceDescription) {
+        String sql = "INSERT INTO vendor_applications (event_id, vendor_id, service_description) VALUES (?, ?, ?)";
         try (Connection conn = DBConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, eventId);
             ps.setInt(2, vendorId);
+            ps.setString(3, serviceDescription);
             return ps.executeUpdate() == 1;
         } catch (SQLException e) {
             System.err.println("[VendorModel] apply: " + e.getMessage());
