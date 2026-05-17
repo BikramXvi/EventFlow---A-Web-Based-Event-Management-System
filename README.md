@@ -51,7 +51,7 @@ Make sure you have the following installed before running the project:
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/createbikram/EventFlow.git
+git clone https://github.com/BikramXvi/EventFlow---A-Web-Based-Event-Management-System.git
 ```
 
 ### Configure Database Connection
