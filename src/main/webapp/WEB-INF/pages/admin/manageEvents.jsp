@@ -9,33 +9,23 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 </head>
 <body>
-
+<% request.setAttribute("activePage", "events"); %>
+<% request.setAttribute("breadcrumbParent", "Admin"); %>
+<% request.setAttribute("breadcrumbCurrent", "Manage Events"); %>
 <div class="dashboard-container">
 
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h2>EventFlow</h2>
-            <p>Admin Panel</p>
-        </div>
-        <ul class="sidebar-menu">
-            <li><a href="${pageContext.request.contextPath}/admin/dashboard">Dashboard</a></li>
-            <li><a href="${pageContext.request.contextPath}/admin/events" class="active">Manage Events</a></li>
-            <li><a href="${pageContext.request.contextPath}/admin/users">Manage Users</a></li>
-            <li><a href="${pageContext.request.contextPath}/admin/volunteers">Manage Volunteers</a></li>
-            <li><a href="${pageContext.request.contextPath}/admin/vendors">Manage Vendors</a></li>
-            <li><a href="${pageContext.request.contextPath}/logout">Logout</a></li>
-        </ul>
-    </div>
+  <%@ include file="/WEB-INF/pages/shared/_sidebarAdmin.jsp" %>
 
     <div class="main-content">
+      <%@ include file="/WEB-INF/pages/shared/_topbar.jsp" %>
+      <div class="content-wrap">
 
-        <div class="page-header" style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="page-header">
             <div>
                 <h1>Manage Events</h1>
                 <p>Create, edit and delete events.</p>
             </div>
-            <a href="${pageContext.request.contextPath}/admin/createEvent" class="btn-primary"
-               style="width:auto; padding: 10px 20px; text-decoration:none;">
+            <a href="${pageContext.request.contextPath}/admin/createEvent" class="btn-secondary" style="text-decoration:none;">
                 + Create New Event
             </a>
         </div>
@@ -110,8 +100,9 @@
             </table>
         </div>
 
-    </div>
-</div>
+      </div><!-- content-wrap -->
+    </div><!-- main-content -->
+</div><!-- dashboard-container -->
 
 </body>
 </html>

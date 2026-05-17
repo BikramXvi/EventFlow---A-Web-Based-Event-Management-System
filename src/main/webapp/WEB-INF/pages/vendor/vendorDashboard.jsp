@@ -9,26 +9,16 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 </head>
 <body>
-
+<% request.setAttribute("activePage", "dashboard"); %>
+<% request.setAttribute("breadcrumbCurrent", "Dashboard"); %>
 <div class="dashboard-container">
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h2>EventFlow</h2>
-            <p>Vendor Panel</p>
-        </div>
-        <ul class="sidebar-menu">
-            <li><a href="${pageContext.request.contextPath}/vendor/dashboard" class="active">Dashboard</a></li>
-            <li><a href="${pageContext.request.contextPath}/vendor/apply">Apply for Event</a></li>
-            <li><a href="${pageContext.request.contextPath}/vendor/applications">My Applications</a></li>
-            <li><a href="${pageContext.request.contextPath}/vendor/profile">My Profile</a></li>
-            <li><a href="${pageContext.request.contextPath}/logout">Logout</a></li>
-        </ul>
-    </div>
+  <%@ include file="/WEB-INF/pages/shared/_sidebarVendor.jsp" %>
 
     <!-- Main Content -->
     <div class="main-content">
+      <%@ include file="/WEB-INF/pages/shared/_topbar.jsp" %>
+      <div class="content-wrap">
 
         <div class="page-header">
             <h1>Welcome, <%= session.getAttribute("userFullName") %></h1>
@@ -99,8 +89,9 @@
             </table>
         </div>
 
-    </div>
-</div>
+      </div><!-- content-wrap -->
+    </div><!-- main-content -->
+</div><!-- dashboard-container -->
 
 </body>
 </html>

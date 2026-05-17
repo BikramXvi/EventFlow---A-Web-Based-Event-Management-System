@@ -1,5 +1,5 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>>
 <%
     if (session.getAttribute("userRole") == null || !session.getAttribute("userRole").equals("admin")) {
         response.sendRedirect(request.getContextPath() + "/login");
@@ -15,48 +15,16 @@
   <link rel="stylesheet" href="/EventFlow/css/style.css"/>
 </head>
 <body>
+<% request.setAttribute("activePage", "users"); %>
+<% request.setAttribute("breadcrumbParent", "Admin"); %>
+<% request.setAttribute("breadcrumbCurrent", "Manage Users"); %>
 <div class="dashboard-container">
 
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <div class="sidebar-header">
-      <div class="sidebar-brand">
-        <div class="sidebar-logo"><span></span><span></span><span></span><span></span></div>
-        <h2>EventFlow</h2>
-      </div>
-      <p>Admin Panel</p>
-    </div>
-    <nav class="sidebar-nav">
-      <ul class="sidebar-menu">
-        <li><a href="/EventFlow/admin/dashboard">Dashboard</a></li>
-        <li><a href="/EventFlow/admin/events">Events</a></li>
-        <li><a href="/EventFlow/admin/users" class="active">Users</a></li>
-        <li><a href="/EventFlow/admin/volunteers">Volunteers</a></li>
-        <li><a href="/EventFlow/admin/vendors">Vendors</a></li>
-      </ul>
-    </nav>
-    <div class="sidebar-footer">
-      <div class="sidebar-avatar">${sessionScope.userName.substring(0,2).toUpperCase()}</div>
-      <div>
-        <div class="sidebar-user-name">${sessionScope.userName}</div>
-        <div class="sidebar-user-email">${sessionScope.userEmail}</div>
-      </div>
-    </div>
-  </div>
+  <%@ include file="/WEB-INF/pages/shared/_sidebarAdmin.jsp" %>
 
   <!-- MAIN -->
   <div class="main-content">
-    <div class="topbar">
-      <div class="breadcrumb">
-        <span class="breadcrumb-seg">Admin</span>
-        <span class="breadcrumb-sep">/</span>
-        <span class="breadcrumb-active">Manage Users</span>
-      </div>
-      <div class="topbar-spacer"></div>
-      <div class="topbar-right">
-        <a href="/EventFlow/logout" class="topbar-btn">Logout</a>
-      </div>
-    </div>
+    <%@ include file="/WEB-INF/pages/shared/_topbar.jsp" %>
 
     <div class="content-wrap">
       <div class="page-header">

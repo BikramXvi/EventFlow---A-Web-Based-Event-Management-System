@@ -1,115 +1,163 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Event - EventFlow</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
-</head>
-<body>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
+<%
+    if (session.getAttribute("userRole") == null ||
+        !session.getAttribute("userRole").equals("admin")) {
+        response.sendRedirect(request.getContextPath() + "/login");
+        return;
+    }
+
+    String[] event = (String[]) request.getAttribute("event");
+%>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Edit Event — EventFlow</title>
+
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css"/>
+
+<style>
+.upload-area {
+  border: 1px dashed var(--border-default);
+  border-radius: var(--r-md);
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  background: var(--bg-input);
+  position: relative;
+}
+
+.upload-area:hover {
+  background: var(--bg-hover);
+}
+
+.upload-preview {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: var(--r-md);
+  margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+<% request.setAttribute("activePage", "events"); %>
+<% request.setAttribute("breadcrumbParent", "Admin / Events"); %>
+<% request.setAttribute("breadcrumbCurrent", "Edit Event"); %>
 <div class="dashboard-container">
 
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h2>EventFlow</h2>
-            <p>Admin Panel</p>
-        </div>
-        <ul class="sidebar-menu">
-            <li><a href="${pageContext.request.contextPath}/admin/dashboard">Dashboard</a></li>
-            <li><a href="${pageContext.request.contextPath}/admin/events" class="active">Manage Events</a></li>
-            <li><a href="${pageContext.request.contextPath}/admin/users">Manage Users</a></li>
-            <li><a href="${pageContext.request.contextPath}/admin/volunteers">Manage Volunteers</a></li>
-            <li><a href="${pageContext.request.contextPath}/admin/vendors">Manage Vendors</a></li>
-            <li><a href="${pageContext.request.contextPath}/logout">Logout</a></li>
-        </ul>
+  <%@ include file="/WEB-INF/pages/shared/_sidebarAdmin.jsp" %>
+
+  <!-- MAIN -->
+  <div class="main-content">
+
+    <%@ include file="/WEB-INF/pages/shared/_topbar.jsp" %>
+
+    <div class="content-wrap">
+    <div class="page-header">
+      <h1>Edit Event</h1>
+      <p>Update event details</p>
     </div>
 
-    <div class="main-content">
+    <c:if test="${not empty errorMsg}">
+      <div class="alert alert-error">${errorMsg}</div>
+    </c:if>
 
-        <div class="page-header">
-            <h1>Edit Event</h1>
-            <p>Update the event details below.</p>
+    <div class="form-card" style="max-width:700px">
+
+      <form method="post"
+            action="${pageContext.request.contextPath}/admin/editEvent"
+            enctype="multipart/form-data">
+
+        <!-- ID -->
+        <input type="hidden" name="id" value="<%= event[0] %>"/>
+
+        <!-- TITLE -->
+        <div class="form-group">
+          <label>Event title</label>
+          <input type="text" name="title" required value="<%= event[1] %>">
         </div>
 
-        <% if (request.getAttribute("errorMessage") != null) { %>
-            <div class="alert alert-error"><%= request.getAttribute("errorMessage") %></div>
-        <% } %>
-
-        <%
-            String[] event = (String[]) request.getAttribute("event");
-        %>
-
-        <div class="table-container">
-            <form action="${pageContext.request.contextPath}/admin/editEvent" method="post">
-
-                <input type="hidden" name="eventId" value="<%= event[0] %>">
-
-                <div class="form-group">
-                    <label>Event Title</label>
-                    <input type="text" name="title" value="<%= event[1] %>" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea name="description" rows="4" required
-                              style="width:100%; padding:10px 14px; border:1px solid #ddd;
-                                     border-radius:8px; font-size:14px; resize:vertical;">
-                        <%= event[2] %>
-                    </textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Location</label>
-                    <input type="text" name="location" value="<%= event[3] %>" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Event Date</label>
-                    <input type="date" name="eventDate" value="<%= event[4] %>" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Start Time</label>
-                    <input type="time" name="startTime" value="<%= event[5] %>" required>
-                </div>
-
-                <div class="form-group">
-                    <label>End Time</label>
-                    <input type="time" name="endTime" value="<%= event[6] %>" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Capacity</label>
-                    <input type="number" name="capacity" value="<%= event[7] %>" min="1" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Status</label>
-                    <select name="status" required>
-                        <option value="upcoming" <%= event[8].equals("upcoming") ? "selected" : "" %>>Upcoming</option>
-                        <option value="ongoing" <%= event[8].equals("ongoing") ? "selected" : "" %>>Ongoing</option>
-                        <option value="completed" <%= event[8].equals("completed") ? "selected" : "" %>>Completed</option>
-                        <option value="cancelled" <%= event[8].equals("cancelled") ? "selected" : "" %>>Cancelled</option>
-                    </select>
-                </div>
-
-                <div style="display:flex; gap:12px; margin-top:10px;">
-                    <button type="submit" class="btn-primary" style="width:auto; padding:10px 24px;">
-                        Update Event
-                    </button>
-                    <a href="${pageContext.request.contextPath}/admin/events"
-                       class="btn-secondary" style="padding:10px 24px; text-decoration:none;">
-                        Cancel
-                    </a>
-                </div>
-
-            </form>
+        <!-- DESCRIPTION -->
+        <div class="form-group">
+          <label>Description</label>
+          <textarea name="description" rows="4"><%= event[2] %></textarea>
         </div>
+
+        <!-- LOCATION -->
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" name="location" required value="<%= event[3] %>">
+        </div>
+
+        <div class="form-row">
+
+          <!-- DATE -->
+          <div class="form-group">
+            <label>Event Date</label>
+            <input type="date" name="eventDate" required value="<%= event[4] %>">
+          </div>
+
+          <!-- STATUS -->
+          <div class="form-group">
+            <label>Status</label>
+            <select name="status">
+              <option value="upcoming" <%= "upcoming".equals(event[8]) ? "selected" : "" %>>Upcoming</option>
+              <option value="ongoing" <%= "ongoing".equals(event[8]) ? "selected" : "" %>>Ongoing</option>
+              <option value="draft" <%= "draft".equals(event[8]) ? "selected" : "" %>>Draft</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+
+          <!-- START TIME -->
+          <div class="form-group">
+            <label>Start Time</label>
+            <input type="time" name="startTime" required value="<%= event[5] %>">
+          </div>
+
+          <!-- END TIME -->
+          <div class="form-group">
+            <label>End Time</label>
+            <input type="time" name="endTime" required value="<%= event[6] %>">
+          </div>
+        </div>
+
+        <!-- CAPACITY -->
+        <div class="form-group">
+          <label>Capacity</label>
+          <input type="number" name="capacity" required value="<%= event[7] %>">
+        </div>
+
+        <!-- IMAGE -->
+        <div class="form-group">
+          <label>Change Image (optional)</label>
+          <input type="file" name="eventImage" accept="image/*">
+
+          <!-- NOTE: you don't currently return image_path in getEventById -->
+          <p style="font-size:12px;color:gray;margin-top:5px;">
+            Upload only if you want to replace existing image
+          </p>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="form-actions">
+          <a href="${pageContext.request.contextPath}/admin/events" class="btn-secondary">Cancel</a>
+          <button type="submit" class="btn-primary">Update Event</button>
+        </div>
+
+      </form>
 
     </div>
-</div>
+    </div><!-- content-wrap -->
+  </div><!-- main-content -->
+</div><!-- dashboard-container -->
 
 </body>
 </html>
